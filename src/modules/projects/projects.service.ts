@@ -1,58 +1,90 @@
 import { Injectable } from '@nestjs/common'
+import { PrismaService } from '../prisma/prisma.service'
 import { CreateRequestDTO, ProjectListItemDTO, UpdateRequestDTO } from './projects.dto'
 
 @Injectable()
 export class ProjectsService {
-  findAll(): ProjectListItemDTO[] {
-    return [
-      {
-        id: '1',
-        name: 'Projeto 1',
-        description: 'Descrição do projeto 1',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(): Promise<ProjectListItemDTO[]> {
+    return this.prisma.project.findMany().then((projects) => {
+      return projects.map((project) => {
+        return {
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          createdAt: project.createdAt.toISOString(),
+          updatedAt: project.updatedAt.toISOString(),
+        }
+      })
+    })
+  }
+
+  async findOne(id: string): Promise<ProjectListItemDTO | null> {
+    const project = await this.prisma.project.findFirst({
+      where: {
+        id,
       },
-      {
-        id: '2',
-        name: 'Projeto 2',
-        description: 'Descrição do projeto 2',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    })
+
+    if (!project) {
+      return null
+    }
+
+    return {
+      ...project,
+      createdAt: project.createdAt.toISOString(),
+      updatedAt: project.updatedAt.toISOString(),
+    }
+  }
+
+  async create(data: CreateRequestDTO): Promise<ProjectListItemDTO> {
+    const project = await this.prisma.project.create({
+      data,
+    })
+
+    if (!project) {
+      throw new Error('Erro ao criar projeto')
+    }
+
+    return {
+      ...project,
+      createdAt: project.createdAt.toISOString(),
+      updatedAt: project.updatedAt.toISOString(),
+    }
+  }
+
+  async update(id: string, data: UpdateRequestDTO): Promise<ProjectListItemDTO> {
+    const projectExist = await this.findOne(id)
+
+    if (!projectExist) {
+      throw new Error('Projeto não encontrado')
+    }
+
+    const project = await this.prisma.project.update({
+      where: {
+        id,
       },
-    ]
-  }
+      data,
+    })
 
-  findOne(id: string): ProjectListItemDTO {
     return {
-      id,
-      name: `Projeto ${id}`,
-      description: 'Descrição do projeto',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      ...project,
+      updatedAt: project.updatedAt.toISOString(),
+      createdAt: project.createdAt.toISOString(),
     }
   }
 
-  create(data: CreateRequestDTO): ProjectListItemDTO {
-    return {
-      id: 'uuid',
-      name: data.name,
-      description: data.description,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+  async delete(id: string) {
+    const projectExist = await this.findOne(id)
+    if (!projectExist) {
+      return new Error('Projeto não encontrado')
     }
-  }
 
-  update(id: string, data: UpdateRequestDTO): ProjectListItemDTO {
-    return {
-      id,
-      name: data.name,
-      description: data.description,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-  }
-
-  delete(id: string) {
-    return `Projeto ${id} deletado com sucesso!`
+    await this.prisma.project.delete({
+      where: {
+        id,
+      },
+    })
   }
 }

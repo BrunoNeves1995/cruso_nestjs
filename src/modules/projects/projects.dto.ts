@@ -28,7 +28,6 @@ export class ProjectListItemDTO {
 export class UpdateRequestDTO {
   @ApiProperty({ description: 'Project name' })
   @IsString()
-  @IsNotEmpty()
   name!: string
   @ApiProperty({ description: 'Project description', required: false })
   @IsString()
