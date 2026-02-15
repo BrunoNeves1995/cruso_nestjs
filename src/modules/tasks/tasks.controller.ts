@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 
 @Controller({version: '1', path: 'projects/:projectId/tasks'})
@@ -6,6 +6,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   async findAllByProject(
     @Param('projectId', ParseUUIDPipe) projectId: string
   ) {
@@ -13,6 +14,7 @@ export class TasksController {
   }
 
   @Get(':taskId')
+  @HttpCode(HttpStatus.OK)
   async findOne(
     @Param('projectId',ParseUUIDPipe) projectId: string,
     @Param('taskId', ParseUUIDPipe) taskId: string,
@@ -21,6 +23,7 @@ export class TasksController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Body() data: any
@@ -29,6 +32,7 @@ export class TasksController {
   }
 
   @Put(':taskId')
+  @HttpCode(HttpStatus.OK)
   async update(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('taskId', ParseUUIDPipe) taskId: string,
@@ -38,6 +42,7 @@ export class TasksController {
   }
 
   @Delete(':taskId')
+    @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('taskId', ParseUUIDPipe) taskId: string,
