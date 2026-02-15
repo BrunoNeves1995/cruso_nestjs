@@ -14,4 +14,33 @@ model Project {
   description String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // 1 Project tem varias Taks
+  tasks Task[]
+}
+
+enum TaskStatus {
+  TODO                                                                          // em aberto
+  IN_PROGRESS                                                                   // em progresso
+  DONE                                                                          // concluído
+}
+
+enum TaskPriority {
+  LOW                                                                           // baixa
+  MEDIUM                                                                        // média
+  HIGH                                                                          // alta
+}
+
+model Task {
+  id String @id @default(uuid())
+  description String
+  status TaskStatus @default(TODO)
+  priority TaskPriority @default(MEDIUM)
+  dueDate DateTime?                                                             // data de vencimento
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamento 1:N -> 1 projeto pode ter várias Tasks e uma tarefa pertence apenas a um Project
+  projectId String
+  project Project @relation(fields: [projectId], references: [id])
 }
