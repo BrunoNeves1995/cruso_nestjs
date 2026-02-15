@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateRequestDTO, ProjectListItemDTO, UpdateRequestDTO } from './projects.dto'
 
@@ -7,7 +7,7 @@ export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<ProjectListItemDTO[]> {
-    return this.prisma.project.findMany().then((projects) => {
+    const projects = await this.prisma.project.findMany().then((projects) => {
       return projects.map((project) => {
         return {
           id: project.id,
@@ -18,6 +18,12 @@ export class ProjectsService {
         }
       })
     })
+
+    if (projects.length <= 0 || !projects) {
+      throw new HttpException('Nenhum projeto encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    return projects
   }
 
   async findOne(id: string): Promise<ProjectListItemDTO | null> {
@@ -27,8 +33,8 @@ export class ProjectsService {
       },
     })
 
-    if (!project) {
-      return null
+    if (!project || project === null) {
+      throw new HttpException('Projeto não encontrado', HttpStatus.NOT_FOUND)
     }
 
     return {
@@ -44,7 +50,7 @@ export class ProjectsService {
     })
 
     if (!project) {
-      throw new Error('Erro ao criar projeto')
+      throw new HttpException('Erro ao criar projeto', HttpStatus.BAD_REQUEST)
     }
 
     return {
@@ -57,8 +63,8 @@ export class ProjectsService {
   async update(id: string, data: UpdateRequestDTO): Promise<ProjectListItemDTO> {
     const projectExist = await this.findOne(id)
 
-    if (!projectExist) {
-      throw new Error('Projeto não encontrado')
+    if (!projectExist || projectExist === null) {
+      throw new HttpException('Erro ao atualiazar projeto', HttpStatus.NOT_FOUND)
     }
 
     const project = await this.prisma.project.update({
@@ -77,8 +83,8 @@ export class ProjectsService {
 
   async delete(id: string) {
     const projectExist = await this.findOne(id)
-    if (!projectExist) {
-      return new Error('Projeto não encontrado')
+    if (!projectExist || projectExist === null) {
+      return new HttpException('Projeto não encontrado', HttpStatus.NOT_FOUND)
     }
 
     await this.prisma.project.delete({

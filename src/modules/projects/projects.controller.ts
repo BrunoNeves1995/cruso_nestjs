@@ -20,14 +20,14 @@ export class ProjectsController {
 
   @Get()
   @ApiResponse({ type: [ProjectListItemDTO] })
-  findAll() {
-    return this.projectsService.findAll()
+  async findAll() {
+    return await this.projectsService.findAll()
   }
 
   @Get(':id')
   @ApiResponse({ type: ProjectListItemDTO })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.projectsService.findOne(id)
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.projectsService.findOne(id)
   }
 
   @Post()
@@ -38,8 +38,8 @@ export class ProjectsController {
 
   @Put(':id')
   @ApiResponse({ type: ProjectListItemDTO })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateRequestDTO) {
-    return this.projectsService.update(id, data)
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateRequestDTO) {
+    return await this.projectsService.update(id, data)
   }
 
   @Delete(':id')
