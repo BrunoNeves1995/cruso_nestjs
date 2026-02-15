@@ -1,22 +1,55 @@
 import { Injectable } from '@nestjs/common'
-import { CreateRequestDTO, UpdateRequestDTO } from './projects.dto'
+import { CreateRequestDTO, ProjectListItemDTO, UpdateRequestDTO } from './projects.dto'
 
 @Injectable()
 export class ProjectsService {
-  findAll() {
-    return ['Projeto 1', 'Projeto 2', 'Projeto 3']
+  findAll(): ProjectListItemDTO[] {
+    return [
+      {
+        id: '1',
+        name: 'Projeto 1',
+        description: 'Descrição do projeto 1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        name: 'Projeto 2',
+        description: 'Descrição do projeto 2',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ]
   }
 
-  findById(id: string) {
-    return `Projeto ${id}`
+  findOne(id: string): ProjectListItemDTO {
+    return {
+      id,
+      name: `Projeto ${id}`,
+      description: 'Descrição do projeto',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
   }
 
-  create(data: CreateRequestDTO) {
-    return 'Projeto criado com sucesso!'
+  create(data: CreateRequestDTO): ProjectListItemDTO {
+    return {
+      id: 'uuid',
+      name: data.name,
+      description: data.description,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
   }
 
-  update(id: string, data: UpdateRequestDTO) {
-    return `Projeto ${id} atualizado com sucesso!`
+  update(id: string, data: UpdateRequestDTO): ProjectListItemDTO {
+    return {
+      id,
+      name: data.name,
+      description: data.description,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
   }
 
   delete(id: string) {
