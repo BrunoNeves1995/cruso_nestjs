@@ -46,9 +46,6 @@ export class TasksService {
           projectId
         },
         data,
-        include: {
-          project: true
-        }
       })
   }
 
