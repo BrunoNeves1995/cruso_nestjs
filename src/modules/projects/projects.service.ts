@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateRequestDTO, ProjectListItemDTO, UpdateRequestDTO } from './projects.dto'
 
@@ -87,10 +87,19 @@ export class ProjectsService {
       return new HttpException('Projeto não encontrado', HttpStatus.NOT_FOUND)
     }
 
-    await this.prisma.project.delete({
-      where: {
-        id,
-      },
-    })
+    try {
+      await this.prisma.project.delete({
+        where: {
+          id,
+        },
+      })
+    } catch (error: any) {
+      if (error.code === 'P2003') {
+        throw new NotFoundException(
+          'Você não pode deletar um projeto que possui tarefas',
+          HttpStatus.BAD_REQUEST.toString(),
+        )
+      }
+    }
   }
 }
