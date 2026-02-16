@@ -9,13 +9,16 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 import { ValidateResourcesIds } from 'src/common/decorator/validate-resources-ids.decorator'
+import { ValidateResourcesIdsInterceptor } from 'src/common/interceptor/validate-resources-ids.interceptor'
 import { CreateRequestDTO, ProjectListItemDTO, UpdateRequestDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
 
 @Controller({ version: '1', path: 'projects' })
+@UseInterceptors(ValidateResourcesIdsInterceptor)
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
