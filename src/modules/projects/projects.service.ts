@@ -26,10 +26,10 @@ export class ProjectsService {
     return projects
   }
 
-  async findOne(id: string): Promise<ProjectListItemDTO | null> {
+  async findOne(projectId: string): Promise<ProjectListItemDTO | null> {
     const project = await this.prisma.project.findFirst({
       where: {
-        id,
+        id: projectId,
       },
     })
 
@@ -60,8 +60,8 @@ export class ProjectsService {
     }
   }
 
-  async update(id: string, data: UpdateRequestDTO): Promise<ProjectListItemDTO> {
-    const projectExist = await this.findOne(id)
+  async update(projectId: string, data: UpdateRequestDTO): Promise<ProjectListItemDTO> {
+    const projectExist = await this.findOne(projectId)
 
     if (!projectExist || projectExist === null) {
       throw new HttpException('Erro ao atualiazar projeto', HttpStatus.NOT_FOUND)
@@ -69,7 +69,7 @@ export class ProjectsService {
 
     const project = await this.prisma.project.update({
       where: {
-        id,
+        id: projectId,
       },
       data,
     })
@@ -81,22 +81,34 @@ export class ProjectsService {
     }
   }
 
-  async delete(id: string) {
-    const projectExist = await this.findOne(id)
+  async delete(projectId: string) {
+    const projectExist = await this.findOne(projectId)
     if (!projectExist || projectExist === null) {
       return new HttpException('Projeto não encontrado', HttpStatus.NOT_FOUND)
     }
 
     try {
-      await this.prisma.project.delete({
+      // Deleta as task vinculada ao project, antes de deletar o project
+      await this.prisma.task.deleteMany({
         where: {
-          id,
+          projectId: projectId,
+        },
+      })
+
+      return this.prisma.project.delete({
+        where: {
+          id: projectId,
         },
       })
     } catch (error: any) {
       if (error.code === 'P2003') {
         throw new NotFoundException(
-          'Você não pode deletar um projeto que possui tarefas',
+          'DP0001 - Você não pode deletar um projeto que possui tarefas',
+          HttpStatus.BAD_REQUEST.toString(),
+        )
+      } else {
+        throw new NotFoundException(
+          'DP0000 Erro ao deletar projeto',
           HttpStatus.BAD_REQUEST.toString(),
         )
       }
