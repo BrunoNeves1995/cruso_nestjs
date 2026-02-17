@@ -37,18 +37,20 @@ export class ProjectsController {
 
   @Post()
   @ApiResponse({ type: ProjectListItemDTO })
-  create(@Body() data: CreateRequestDTO) {
+  async create(@Body() data: CreateRequestDTO) {
     return this.projectsService.create(data)
   }
 
   @Put(':projectId')
   @ApiResponse({ type: ProjectListItemDTO })
+  @ValidateResourcesIds()
   async update(@Param('projectId', ParseUUIDPipe) id: string, @Body() data: UpdateRequestDTO) {
-    return await this.projectsService.update(id, data)
+    return this.projectsService.update(id, data)
   }
 
   @Delete(':projectId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ValidateResourcesIds()
   delete(@Param('projectId', ParseUUIDPipe) id: string) {
     return this.projectsService.delete(id)
   }

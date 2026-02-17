@@ -28,7 +28,6 @@ export class TasksController {
   }
 
   @Get(':taskId')
-  @HttpCode(HttpStatus.OK)
   @ValidateResourcesIds()
   async findOne(
     @Param('projectId', ParseUUIDPipe) projectId: string,
