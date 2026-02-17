@@ -65,7 +65,10 @@ export class ProjectsService {
 
   async create(data: CreateRequestDTO): Promise<ProjectListItemDTO> {
     const project = await this.prisma.project.create({
-      data,
+      data: {
+        ...data,
+        createdById: '123', // TODO - remover quando tiver autenticação
+      },
     })
 
     if (!project) {
