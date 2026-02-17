@@ -32,7 +32,32 @@ model User {
 
   // 1 User tem varias Comment
   comments Comment[]
+
+  // N User pode ter varios N ProjectCollaborator
+  collaborators ProjectCollaborator[]
 }
+
+enum CollaboratorRole {
+  VIEWER                                                                       // Visualizador
+  EDITOR                                                                        // Editor
+  OWNER                                                                         // Dono do projeto
+}
+
+// Relacionamento N:N -> (1 Usuario ou N Usuarios) podem ter vários ( 1 Projetos ou N Projetos )
+// Relacionamento N:N -> ( 1 Projetos ou N Projetos ) pode te pertencer a vários ( N Usuario ou 1 Usuario )
+model ProjectCollaborator {
+  id String @id @default(uuid())
+  role CollaboratorRole @default(EDITOR)
+  userId String
+  projectId String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@unique([userId, projectId])
+}
+
 
 model Project {
   id String @id @default(uuid())
@@ -47,6 +72,9 @@ model Project {
   // Relacionamento 1:N -> 1 Usuario pode ter vários N Projetos
   createdById String
   createdBy User @relation("UserProjects", fields: [createdById], references: [id])
+
+  // N Project pode ter varios N ProjectCollaborator
+  collaborators ProjectCollaborator[]
 }
 
 enum TaskStatus {
