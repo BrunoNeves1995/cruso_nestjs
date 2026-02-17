@@ -8,6 +8,32 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER                                                                          // Usuário comum
+  ADMIN                                                                         // Administrador
+}
+
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  avatar String?
+  role Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 1 User tem varias Project
+  createdProjects Project[] @relation("UserProjects")
+
+  // 1 User tem varias Task
+  tasksAssigned Task[] @relation("UsertasksAssigned")                           // Tasks assinaladas por um usuário
+
+  // 1 User tem varias Comment
+  comments Comment[]
+}
+
 model Project {
   id String @id @default(uuid())
   name String
@@ -17,6 +43,10 @@ model Project {
 
   // 1 Project tem varias Taks
   tasks Task[]
+
+  // Relacionamento 1:N -> 1 Usuario pode ter vários N Projetos
+  createdById String
+  createdBy User @relation("UserProjects", fields: [createdById], references: [id])
 }
 
 enum TaskStatus {
@@ -44,4 +74,26 @@ model Task {
   // Relacionamento 1:N -> 1 projeto pode ter várias Tasks e uma tarefa pertence apenas a um Project
   projectId String
   project Project @relation(fields: [projectId], references: [id])
+
+  // Relacionamento 1:N -> 1 Usuario pode ter vários N Projetos
+  assignedId String?
+  assigne User? @relation("UsertasksAssigned", fields: [assignedId], references: [id])
+
+  // 1 Task tem varias Comment
+  comments Comment[]
+}
+
+model Comment {
+  id String @id @default(uuid())
+  content String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+   // Relacionamento 1:N -> 1 Usuario pode ter vários N Comentários
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
+
+   // Relacionamento 1:N -> 1 Tarefa pode ter vários N Comentários
+  taskId String
+  task Task @relation(fields: [taskId], references: [id])
 }
