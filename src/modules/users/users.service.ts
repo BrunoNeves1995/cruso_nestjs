@@ -5,10 +5,38 @@ import { PrismaService } from '../prisma/prisma.service'
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll() {
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+  }
+
   async findById(id: string) {
     return this.prisma.user.findUnique({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+        createdProjects: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
       },
     })
   }
@@ -18,11 +46,15 @@ export class UsersService {
       where: {
         email,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     })
-  }
-
-  async findAll() {
-    return await this.prisma.user.findMany()
   }
 
   async create(data: any) {
