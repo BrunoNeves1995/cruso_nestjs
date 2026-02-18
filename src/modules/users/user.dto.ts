@@ -45,3 +45,13 @@ export class UpdateUserDTO {
   @IsOptional()
   role?: Role
 }
+
+export class UserListItemDTO {
+  @ApiProperty() id!: string
+  @ApiProperty() name!: string
+  @ApiProperty() email!: string
+  @ApiProperty() avatar!: string
+  @ApiProperty() role!: Role
+  @ApiProperty() createdAt!: Date
+  @ApiProperty() updatedAt!: Date
+}

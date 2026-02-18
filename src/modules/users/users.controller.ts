@@ -11,7 +11,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common'
-import { CreateUserDTO, UpdateUserDTO } from './user.dto'
+import { ApiResponse } from '@nestjs/swagger'
+import { CreateUserDTO, UpdateUserDTO, UserListItemDTO } from './user.dto'
 import { UsersService } from './users.service'
 
 @Controller({ version: '1', path: 'users' })
@@ -19,6 +20,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @ApiResponse({ type: [UserListItemDTO] })
   async findAll() {
     return await this.usersService.findAll()
   }
