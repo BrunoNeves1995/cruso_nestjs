@@ -11,6 +11,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common'
+import { CreateUserDTO, UpdateUserDTO } from './user.dto'
 import { UsersService } from './users.service'
 
 @Controller({ version: '1', path: 'users' })
@@ -42,13 +43,13 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() data: any) {
+  async create(@Body() data: CreateUserDTO) {
     return await this.usersService.create(data)
   }
 
   @Put(':userId')
   @HttpCode(HttpStatus.OK)
-  async update(@Param('userId', ParseUUIDPipe) userId: string, @Body() data: any) {
+  async update(@Param('userId', ParseUUIDPipe) userId: string, @Body() data: UpdateUserDTO) {
     const user = await this.usersService.findById(userId)
     if (!user) {
       throw new NotFoundException('Usuário não encontrado')
