@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
-import { CreateUserDTO, UpdateUserDTO, UserListItemDTO } from './user.dto'
+import { CreateUserDTO, UpdateUserDTO, UserFullDTO, UserListItemDTO } from './user.dto'
 import { UsersService } from './users.service'
 
 @Controller({ version: '1', path: 'users' })
@@ -26,7 +26,8 @@ export class UsersController {
   }
 
   @Get(':userId')
-  async findById(@Param('userId', ParseUUIDPipe) userId: string) {
+  @ApiResponse({ type: UserFullDTO })
+  async findOne(@Param('userId', ParseUUIDPipe) userId: string) {
     const user = await this.usersService.findById(userId)
     if (!user) {
       throw new NotFoundException('Usuário não encontrado')

@@ -55,3 +55,13 @@ export class UserListItemDTO {
   @ApiProperty() createdAt!: Date
   @ApiProperty() updatedAt!: Date
 }
+
+class UserProjectDTO {
+  @ApiProperty() id!: string
+  @ApiProperty() name!: string
+  @ApiProperty({ nullable: true, required: false }) description!: string
+}
+export class UserFullDTO extends UserListItemDTO {
+  @ApiProperty({ type: [UserProjectDTO] })
+  createdProjects!: UserProjectDTO[]
+}
